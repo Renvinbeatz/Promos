@@ -1,0 +1,433 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<title>Promos Box — Achadinhos para sua casa direto no WhatsApp</title>
+<meta name="description" content="Entre gratuitamente no grupo Promos Box e receba achadinhos de decoração, cozinha e eletrodomésticos direto no seu WhatsApp.">
+
+<!-- Open Graph -->
+<meta property="og:title" content="Promos Box — Achadinhos para sua casa">
+<meta property="og:description" content="Promoções de decoração, cozinha, eletrodomésticos e muito mais, selecionadas e enviadas direto no WhatsApp.">
+<meta property="og:type" content="website">
+<meta property="og:image" content="logo.png">
+
+<link rel="icon" type="image/png" href="logo.png">
+<link rel="apple-touch-icon" href="logo.png">
+
+<meta name="theme-color" content="#116C7B">
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,600&family=Manrope:wght@400;600;800&display=swap" rel="stylesheet">
+
+<style>
+  :root{
+    --teal-900:#0E5865;
+    --teal-700:#116C7B;
+    --teal-600:#158396;
+    --teal-400:#4FAAB8;
+    --blush-050:#FDF5F0;
+    --blush-100:#FBEAE1;
+    --blush-200:#F5DED2;
+    --plum-900:#3A2C31;
+    --plum-700:#5A464C;
+    --coral-500:#E2684B;
+    --white:#FFFFFF;
+
+    --font-display:'Fraunces', serif;
+    --font-body:'Manrope', sans-serif;
+
+    --radius-card:22px;
+    --radius-pill:999px;
+    --shadow-teal:0 14px 30px -12px rgba(14,88,101,0.35);
+    --shadow-soft:0 10px 24px -14px rgba(58,44,49,0.25);
+  }
+
+  *{box-sizing:border-box;}
+  html{scroll-behavior:smooth;}
+  body{
+    margin:0;
+    font-family:var(--font-body);
+    color:var(--plum-900);
+    background:var(--blush-050);
+    -webkit-font-smoothing:antialiased;
+    overflow-x:hidden;
+  }
+  img{max-width:100%;display:block;}
+  a{text-decoration:none;color:inherit;}
+
+  .wrap{
+    max-width:520px;
+    margin:0 auto;
+    padding:0 24px;
+  }
+
+  h1,h2,h3{
+    font-family:var(--font-display);
+    line-height:1.15;
+    margin:0;
+    font-weight:600;
+  }
+  p{margin:0;line-height:1.55;}
+
+  /* ---------- Botões ---------- */
+  .btn{
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    gap:10px;
+    width:100%;
+    padding:18px 24px;
+    border-radius:var(--radius-pill);
+    font-family:var(--font-body);
+    font-weight:800;
+    font-size:16px;
+    letter-spacing:0.01em;
+    border:none;
+    cursor:pointer;
+    transition:transform .15s ease;
+  }
+  .btn:active{transform:scale(0.97);}
+  .btn:focus-visible{outline:3px solid var(--coral-500);outline-offset:3px;}
+
+  .btn-light{
+    background:var(--blush-050);
+    color:var(--teal-900);
+    box-shadow:var(--shadow-soft);
+  }
+  .btn-dark{
+    background:var(--plum-900);
+    color:var(--blush-050);
+    box-shadow:var(--shadow-teal);
+  }
+  .btn svg{flex-shrink:0;}
+
+  .microcopy{
+    text-align:center;
+    font-size:13px;
+    font-weight:600;
+    margin-top:14px;
+    opacity:0.85;
+  }
+
+  .badge{
+    display:inline-flex;
+    align-items:center;
+    gap:8px;
+    padding:9px 16px;
+    border-radius:var(--radius-pill);
+    background:rgba(255,255,255,0.16);
+    color:var(--white);
+    font-size:13px;
+    font-weight:600;
+    margin-top:22px;
+  }
+
+  /* ---------- Hero ---------- */
+  .hero{
+    background:var(--teal-700);
+    padding:44px 0 52px;
+    text-align:center;
+    color:var(--white);
+  }
+  .hero .logo{
+    width:88px;
+    height:88px;
+    border-radius:50%;
+    margin:0 auto 22px;
+    box-shadow:0 10px 26px -10px rgba(0,0,0,0.4);
+  }
+  .hero h1{
+    font-size:29px;
+    color:var(--white);
+  }
+  .hero .sub{
+    margin-top:16px;
+    font-size:16px;
+    color:rgba(255,255,255,0.88);
+    max-width:340px;
+    margin-left:auto;
+    margin-right:auto;
+  }
+  .hero .cta-block{
+    margin-top:28px;
+  }
+
+  /* ---------- Seção: o que você encontra ---------- */
+  .section{
+    padding:56px 0;
+  }
+  #beneficios{
+    padding-bottom:52px;
+  }
+  .section-heading{
+    font-size:24px;
+    margin-bottom:28px;
+  }
+
+  .cards{
+    display:flex;
+    flex-direction:column;
+    gap:14px;
+  }
+  .card{
+    display:flex;
+    gap:16px;
+    align-items:flex-start;
+    background:var(--blush-200);
+    border-radius:var(--radius-card);
+    padding:20px;
+  }
+  .card .icon{
+    flex-shrink:0;
+    width:48px;
+    height:48px;
+    border-radius:14px;
+    background:var(--teal-700);
+    display:flex;
+    align-items:center;
+    justify-content:center;
+  }
+  .card .icon svg{width:24px;height:24px;stroke:var(--white);}
+  .card h3{
+    font-size:17px;
+    font-weight:600;
+    margin-bottom:5px;
+  }
+  .card p{
+    font-size:14.5px;
+    color:var(--plum-700);
+  }
+
+  .note{
+    margin-top:20px;
+    font-size:14px;
+    color:var(--plum-700);
+    font-style:italic;
+    text-align:center;
+    padding:0 8px;
+  }
+
+  /* ---------- Benefício (banda escura) ---------- */
+  .band-dark{
+    background:var(--teal-900);
+    color:var(--white);
+    padding:52px 0;
+  }
+  .band-dark h2{
+    font-size:23px;
+    color:var(--white);
+  }
+  .band-dark p.copy{
+    margin-top:14px;
+    font-size:15.5px;
+    color:rgba(255,255,255,0.85);
+  }
+  .band-dark .cta-block{
+    margin-top:26px;
+  }
+
+  /* ---------- Barra fixa ---------- */
+  footer.legal{
+    padding:18px 0 110px;
+    text-align:center;
+  }
+  footer.legal p{
+    font-size:11.5px;
+    line-height:1.6;
+    color:var(--plum-700);
+    opacity:0.75;
+  }
+
+  .sticky-bar{
+    position:fixed;
+    left:0;right:0;bottom:0;
+    padding:12px 16px calc(12px + env(safe-area-inset-bottom));
+    background:var(--blush-050);
+    border-top:1px solid var(--blush-200);
+    box-shadow:0 -8px 24px -12px rgba(58,44,49,0.25);
+    transform:translateY(120%);
+    transition:transform .3s ease;
+    z-index:40;
+  }
+  .sticky-bar.is-visible{transform:translateY(0);}
+  .sticky-bar .btn{padding:15px 22px;font-size:15px;}
+
+  @media (min-width:521px){
+    .wrap{padding:0 32px;}
+  }
+</style>
+</head>
+<body>
+
+<svg width="0" height="0" style="position:absolute" aria-hidden="true">
+  <symbol id="ico-whatsapp" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+    <path d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5z"/>
+  </symbol>
+</svg>
+
+<!-- ============ HERO ============ -->
+<header class="hero">
+  <div class="wrap">
+    <img class="logo" src="logo.png" alt="Promos Box" width="88" height="88">
+    <h1>Achadinhos certos da shô pra sua casa e decoração 💙</h1>
+    <p class="sub">Para de perder tempo rodando o app atrás de promoção — a gente separa os melhores achadinhos e te manda direto no zap.</p>
+
+    <span class="badge">🛍️ Se tem Shopee no meio, a gente já tá de olho 👀</span>
+
+    <div class="cta-block">
+      <a href="#" class="btn btn-light js-cta" data-cta="hero" aria-label="Entrar no grupo gratuitamente pelo WhatsApp">
+        <svg width="20" height="20"><use href="#ico-whatsapp"/></svg>
+        ENTRAR NO GRUPO GRATUITAMENTE
+      </a>
+      <p class="microcopy">Entrada gratuita • Promoções reais e verificadas</p>
+    </div>
+  </div>
+</header>
+
+<!-- ============ O QUE VOCÊ VAI ENCONTRAR ============ -->
+<section class="section" id="categorias">
+  <div class="wrap">
+    <h2 class="section-heading">O que rola por aqui 👀</h2>
+
+    <div class="cards">
+      <div class="card">
+        <div class="icon">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 12l2-2 7-7 7 7 2 2"/><path d="M5 10v10a1 1 0 0 0 1 1h4v-6h4v6h4a1 1 0 0 0 1-1V10"/></svg>
+        </div>
+        <div>
+          <h3>🏠 Casa &amp; Decoração</h3>
+          <p>Aqueles achadinhos pra deixar sala, quarto e banheiro com outra cara.</p>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="icon">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 12h16"/><path d="M4 12a8 6 0 0 0 16 0"/><path d="M8 12V7a4 4 0 0 1 8 0v5"/></svg>
+        </div>
+        <div>
+          <h3>🍳 Cozinha</h3>
+          <p>Utensílios e organizadores que facilitam demais o dia a dia.</p>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="icon">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="6" y="2" width="12" height="20" rx="2"/><line x1="10" y1="7" x2="14" y2="7"/><circle cx="12" cy="15" r="2.2"/></svg>
+        </div>
+        <div>
+          <h3>⚡ Eletrodomésticos</h3>
+          <p>Ofertas de eletros pra ajudar (e muito) na rotina.</p>
+        </div>
+      </div>
+    </div>
+
+    <p class="note">E de vez em quando aparece um achadinho fora dessas categorias também, viu?</p>
+  </div>
+</section>
+
+<!-- ============ BENEFÍCIO ============ -->
+<section class="band-dark" id="beneficios">
+  <div class="wrap">
+    <h2>Você não precisa ficar procurando promoções.</h2>
+    <p class="copy">A gente pesquisa, compara e seleciona as melhores promoções todos os dias. Você recebe direto no WhatsApp e decide, com calma, o que faz sentido pra sua casa.</p>
+    <div class="cta-block">
+      <a href="#" class="btn btn-light js-cta" data-cta="beneficios" aria-label="Quero receber os achadinhos pelo WhatsApp">
+        <svg width="20" height="20"><use href="#ico-whatsapp"/></svg>
+        QUERO RECEBER OS ACHADINHOS
+      </a>
+    </div>
+  </div>
+</section>
+
+<footer class="legal">
+  <div class="wrap">
+    <p>Promos Box é um grupo independente de curadoria de ofertas.<br>Não somos afiliados oficialmente à Shopee ou a outros marketplaces citados.</p>
+  </div>
+</footer>
+
+<!-- ============ BARRA FIXA (mobile) ============ -->
+<div class="sticky-bar" id="stickyBar">
+  <a href="#" class="btn btn-dark js-cta" data-cta="sticky" aria-label="Entrar no grupo gratuitamente">
+    <svg width="18" height="18"><use href="#ico-whatsapp"/></svg>
+    ENTRAR NO GRUPO GRATUITAMENTE
+  </a>
+</div>
+
+<script>
+  // ---- Link único do grupo: troque APENAS esta variável ----
+  const WHATSAPP_GROUP_URL = "https://chat.whatsapp.com/LemV6lEYbvQ64OjSFRsirC?s=cl&p=a&mlu=4&ilr=4";
+
+  document.querySelectorAll('.js-cta').forEach((el) => {
+    el.setAttribute('href', WHATSAPP_GROUP_URL);
+    el.setAttribute('target', '_blank');
+    el.setAttribute('rel', 'noopener');
+  });
+
+  // Mostra a barra fixa depois que o hero sai da tela
+  const hero = document.querySelector('.hero');
+  const stickyBar = document.getElementById('stickyBar');
+
+  if ('IntersectionObserver' in window && hero && stickyBar) {
+    const observer = new IntersectionObserver(
+      ([entry]) => {
+        stickyBar.classList.toggle('is-visible', !entry.isIntersecting);
+      },
+      { threshold: 0 }
+    );
+    observer.observe(hero);
+  }
+
+  // ---- Analytics: registra visitas e cliques no Supabase ----
+  (function () {
+    const SUPABASE_URL = "https://pzfdzpiwchskqyxydaex.supabase.co";
+    const SUPABASE_KEY = "sb_publishable_3okbJqMe8xOIqtcRfzQKyg_E3EN01r3";
+    const SITE = "promosbox";
+
+    function getSessionId() {
+      try {
+        let sid = sessionStorage.getItem('pb_sid');
+        if (!sid) {
+          sid = 'sid_' + Date.now() + '_' + Math.random().toString(36).slice(2, 10);
+          sessionStorage.setItem('pb_sid', sid);
+        }
+        return sid;
+      } catch (e) {
+        return 'sid_no_storage';
+      }
+    }
+
+    function track(eventType, target) {
+      const payload = {
+        site: SITE,
+        event_type: eventType,
+        target: target || null,
+        path: location.pathname,
+        referrer: document.referrer || null,
+        session_id: getSessionId(),
+        user_agent: navigator.userAgent
+      };
+      fetch(SUPABASE_URL + '/rest/v1/site_events', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'apikey': SUPABASE_KEY,
+          'Authorization': 'Bearer ' + SUPABASE_KEY
+        },
+        body: JSON.stringify(payload),
+        keepalive: true
+      }).catch(function () { /* falha silenciosa: não deve afetar a navegação */ });
+    }
+
+    track('pageview');
+    document.querySelectorAll('.js-cta').forEach(function (el) {
+      el.addEventListener('click', function () {
+        track('click', el.getAttribute('data-cta') || 'unknown');
+      });
+    });
+  })();
+</script>
+
+</body>
+</html>

@@ -1,0 +1,547 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Painel — Promos Box</title>
+<meta name="robots" content="noindex, nofollow">
+
+<link rel="icon" type="image/png" href="logo.png">
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,600;9..144,700&family=Manrope:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
+<style>
+  :root{
+    --teal-900:#0E5865;
+    --teal-700:#116C7B;
+    --teal-050:#EAF4F5;
+    --blush-050:#FDF5F0;
+    --blush-200:#F5DED2;
+    --plum-900:#3A2C31;
+    --plum-600:#6B5860;
+    --plum-300:#B6A6AC;
+    --coral-500:#E2684B;
+    --coral-050:#FCECE7;
+    --line:#EADFD8;
+    --white:#FFFFFF;
+
+    --font-display:'Fraunces', serif;
+    --font-body:'Manrope', sans-serif;
+  }
+
+  *{box-sizing:border-box;}
+  body{
+    margin:0;
+    background:var(--blush-050);
+    color:var(--plum-900);
+    font-family:var(--font-body);
+    -webkit-font-smoothing:antialiased;
+  }
+  h1,h2,h3{font-family:var(--font-display);margin:0;font-weight:600;}
+  p{margin:0;}
+  button{font-family:var(--font-body);cursor:pointer;}
+  input{font-family:var(--font-body);}
+
+  .hidden{display:none !important;}
+
+  /* ---------- Login ---------- */
+  #loginScreen{
+    min-height:100vh;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    padding:24px;
+  }
+  .login-card{
+    width:100%;
+    max-width:360px;
+    background:var(--white);
+    border:1px solid var(--line);
+    border-radius:20px;
+    padding:32px 28px;
+  }
+  .login-card img{
+    width:56px;height:56px;border-radius:50%;
+    margin-bottom:18px;
+  }
+  .login-card h1{font-size:22px;margin-bottom:6px;}
+  .login-card .hint{
+    font-size:13.5px;color:var(--plum-600);margin-bottom:22px;
+  }
+  .field{margin-bottom:14px;}
+  .field label{
+    display:block;font-size:13px;font-weight:600;
+    color:var(--plum-600);margin-bottom:6px;
+  }
+  .field input{
+    width:100%;padding:12px 14px;
+    border:1px solid var(--line);border-radius:10px;
+    font-size:15px;color:var(--plum-900);
+    background:var(--blush-050);
+  }
+  .field input:focus{outline:2px solid var(--teal-700);outline-offset:1px;}
+  .btn-primary{
+    width:100%;padding:13px;margin-top:6px;
+    background:var(--teal-900);color:var(--white);
+    border:none;border-radius:10px;
+    font-weight:700;font-size:15px;
+  }
+  .btn-primary:active{transform:scale(0.98);}
+  .error-msg{
+    margin-top:14px;font-size:13.5px;
+    color:var(--coral-500);font-weight:600;
+    display:none;
+  }
+
+  /* ---------- Dashboard ---------- */
+  #dashboard{max-width:1040px;margin:0 auto;padding:24px 20px 60px;}
+
+  .topbar{
+    display:flex;align-items:center;gap:12px;
+    padding:6px 0 22px;
+    flex-wrap:wrap;
+  }
+  .topbar img{width:38px;height:38px;border-radius:50%;flex-shrink:0;}
+  .topbar h1{font-size:19px;flex:1;min-width:160px;}
+  .topbar .actions{display:flex;gap:8px;align-items:center;}
+
+  select#rangeSelect{
+    padding:9px 12px;border-radius:9px;border:1px solid var(--line);
+    background:var(--white);font-size:13.5px;font-weight:600;color:var(--plum-900);
+  }
+  .btn-ghost{
+    padding:9px 14px;border-radius:9px;border:1px solid var(--line);
+    background:var(--white);font-size:13.5px;font-weight:600;color:var(--plum-600);
+  }
+
+  .stat-grid{
+    display:grid;grid-template-columns:repeat(2,1fr);gap:12px;
+    margin-bottom:22px;
+  }
+  @media (min-width:640px){
+    .stat-grid{grid-template-columns:repeat(4,1fr);}
+  }
+  .stat-card{
+    background:var(--white);border:1px solid var(--line);
+    border-radius:16px;padding:16px 18px;
+  }
+  .stat-card .label{font-size:12.5px;color:var(--plum-600);font-weight:600;}
+  .stat-card .value{font-family:var(--font-display);font-size:28px;margin-top:6px;}
+  .stat-card.pageviews .value{color:var(--teal-900);}
+  .stat-card.clicks .value{color:var(--coral-500);}
+
+  .panel{
+    background:var(--white);border:1px solid var(--line);
+    border-radius:18px;padding:20px 20px 8px;margin-bottom:18px;
+  }
+  .panel h2{font-size:16px;margin-bottom:14px;}
+  .panel .empty{
+    font-size:13.5px;color:var(--plum-600);padding:10px 0 18px;
+  }
+
+  .legend{display:flex;gap:16px;font-size:12.5px;color:var(--plum-600);margin-bottom:12px;}
+  .legend span{display:inline-flex;align-items:center;gap:6px;}
+  .legend i{width:10px;height:10px;border-radius:3px;display:inline-block;}
+  .legend .i-view{background:var(--teal-700);}
+  .legend .i-click{background:var(--coral-500);}
+
+  .two-col{display:grid;grid-template-columns:1fr;gap:18px;}
+  @media (min-width:760px){
+    .two-col{grid-template-columns:1fr 1fr;}
+  }
+
+  table{width:100%;border-collapse:collapse;font-size:13.5px;}
+  th{
+    text-align:left;font-size:11.5px;text-transform:none;
+    color:var(--plum-600);font-weight:700;
+    padding:8px 6px;border-bottom:1px solid var(--line);
+  }
+  td{padding:9px 6px;border-bottom:1px solid var(--line);color:var(--plum-900);}
+  tr:last-child td{border-bottom:none;}
+  td.num{text-align:right;font-variant-numeric:tabular-nums;}
+  .tag{
+    display:inline-block;padding:2px 9px;border-radius:999px;
+    font-size:11.5px;font-weight:700;
+  }
+  .tag.pageview{background:var(--teal-050);color:var(--teal-900);}
+  .tag.click{background:var(--coral-050);color:var(--coral-500);}
+
+  .events-scroll{max-height:340px;overflow-y:auto;}
+
+  footer.note{
+    text-align:center;font-size:12px;color:var(--plum-300);
+    padding:10px 0 30px;
+  }
+</style>
+</head>
+<body>
+
+<!-- ============ LOGIN ============ -->
+<div id="loginScreen">
+  <div class="login-card">
+    <img src="logo.png" alt="Promos Box">
+    <h1>Painel Promos Box</h1>
+    <p class="hint">Entre com a conta de admin para ver as métricas do site.</p>
+
+    <form id="loginForm">
+      <div class="field">
+        <label for="email">E-mail</label>
+        <input type="email" id="email" autocomplete="username" required>
+      </div>
+      <div class="field">
+        <label for="password">Senha</label>
+        <input type="password" id="password" autocomplete="current-password" required>
+      </div>
+      <button type="submit" class="btn-primary" id="loginBtn">Entrar</button>
+      <p class="error-msg" id="loginError"></p>
+    </form>
+  </div>
+</div>
+
+<!-- ============ DASHBOARD ============ -->
+<div id="dashboard" class="hidden">
+  <div class="topbar">
+    <img src="logo.png" alt="Promos Box">
+    <h1>Painel Promos Box</h1>
+    <div class="actions">
+      <select id="rangeSelect">
+        <option value="1">Hoje</option>
+        <option value="7" selected>Últimos 7 dias</option>
+        <option value="30">Últimos 30 dias</option>
+        <option value="0">Tudo</option>
+      </select>
+      <button class="btn-ghost" id="logoutBtn">Sair</button>
+    </div>
+  </div>
+
+  <div class="stat-grid">
+    <div class="stat-card pageviews">
+      <div class="label">Visitas</div>
+      <div class="value" id="statViews">—</div>
+    </div>
+    <div class="stat-card clicks">
+      <div class="label">Cliques no WhatsApp</div>
+      <div class="value" id="statClicks">—</div>
+    </div>
+    <div class="stat-card">
+      <div class="label">Taxa de clique</div>
+      <div class="value" id="statCtr">—</div>
+    </div>
+    <div class="stat-card">
+      <div class="label">Visitantes únicos (aprox.)</div>
+      <div class="value" id="statUnique">—</div>
+    </div>
+  </div>
+
+  <div class="panel">
+    <h2>Visitas e cliques por dia</h2>
+    <div class="legend">
+      <span><i class="i-view"></i> Visitas</span>
+      <span><i class="i-click"></i> Cliques</span>
+    </div>
+    <div id="chartWrap"></div>
+    <p class="empty hidden" id="chartEmpty">Ainda não há dados suficientes para o gráfico neste período.</p>
+  </div>
+
+  <div class="two-col">
+    <div class="panel">
+      <h2>Cliques por botão</h2>
+      <table id="targetsTable">
+        <thead><tr><th>Botão</th><th class="num">Cliques</th></tr></thead>
+        <tbody></tbody>
+      </table>
+      <p class="empty hidden" id="targetsEmpty">Nenhum clique registrado ainda neste período.</p>
+    </div>
+
+    <div class="panel">
+      <h2>De onde vêm as visitas</h2>
+      <table id="referrersTable">
+        <thead><tr><th>Origem</th><th class="num">Visitas</th></tr></thead>
+        <tbody></tbody>
+      </table>
+      <p class="empty hidden" id="referrersEmpty">Nenhuma visita registrada ainda neste período.</p>
+    </div>
+  </div>
+
+  <div class="panel">
+    <h2>Últimos eventos</h2>
+    <div class="events-scroll">
+      <table id="eventsTable">
+        <thead><tr><th>Quando</th><th>Tipo</th><th>Detalhe</th></tr></thead>
+        <tbody></tbody>
+      </table>
+    </div>
+    <p class="empty hidden" id="eventsEmpty">Nenhum evento registrado ainda.</p>
+  </div>
+
+  <footer class="note">Dados do site Promos Box · atualiza ao trocar o período ou recarregar a página</footer>
+</div>
+
+<script>
+  const SUPABASE_URL = "https://pzfdzpiwchskqyxydaex.supabase.co";
+  const SUPABASE_KEY = "sb_publishable_3okbJqMe8xOIqtcRfzQKyg_E3EN01r3";
+  const SITE = "promosbox";
+
+  const sb = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+
+  const loginScreen = document.getElementById('loginScreen');
+  const dashboard = document.getElementById('dashboard');
+  const loginForm = document.getElementById('loginForm');
+  const loginError = document.getElementById('loginError');
+  const loginBtn = document.getElementById('loginBtn');
+
+  function showError(msg) {
+    loginError.textContent = msg;
+    loginError.style.display = 'block';
+  }
+
+  async function checkIsAdmin() {
+    const { data, error } = await sb.rpc('is_admin');
+    if (error) return false;
+    return data === true;
+  }
+
+  async function boot() {
+    const { data: { session } } = await sb.auth.getSession();
+    if (session) {
+      const isAdmin = await checkIsAdmin();
+      if (isAdmin) {
+        enterDashboard();
+        return;
+      }
+      await sb.auth.signOut();
+    }
+    loginScreen.classList.remove('hidden');
+    dashboard.classList.add('hidden');
+  }
+
+  loginForm.addEventListener('submit', async (e) => {
+    e.preventDefault();
+    loginError.style.display = 'none';
+    loginBtn.disabled = true;
+    loginBtn.textContent = 'Entrando...';
+
+    const email = document.getElementById('email').value.trim();
+    const password = document.getElementById('password').value;
+
+    const { error } = await sb.auth.signInWithPassword({ email, password });
+
+    if (error) {
+      showError('E-mail ou senha incorretos.');
+      loginBtn.disabled = false;
+      loginBtn.textContent = 'Entrar';
+      return;
+    }
+
+    const isAdmin = await checkIsAdmin();
+    if (!isAdmin) {
+      await sb.auth.signOut();
+      showError('Essa conta não tem acesso ao painel.');
+      loginBtn.disabled = false;
+      loginBtn.textContent = 'Entrar';
+      return;
+    }
+
+    loginBtn.disabled = false;
+    loginBtn.textContent = 'Entrar';
+    enterDashboard();
+  });
+
+  document.getElementById('logoutBtn').addEventListener('click', async () => {
+    await sb.auth.signOut();
+    location.reload();
+  });
+
+  function enterDashboard() {
+    loginScreen.classList.add('hidden');
+    dashboard.classList.remove('hidden');
+    loadData();
+  }
+
+  document.getElementById('rangeSelect').addEventListener('change', loadData);
+
+  function rangeCutoffIso() {
+    const days = parseInt(document.getElementById('rangeSelect').value, 10);
+    if (!days) return null;
+    const d = new Date();
+    d.setDate(d.getDate() - days);
+    d.setHours(0, 0, 0, 0);
+    return d.toISOString();
+  }
+
+  function dayKey(iso) {
+    return iso.slice(0, 10);
+  }
+
+  function hostFromReferrer(ref) {
+    if (!ref) return 'Direto';
+    try {
+      const h = new URL(ref).hostname.replace(/^www\./, '');
+      return h || 'Direto';
+    } catch (e) {
+      return 'Direto';
+    }
+  }
+
+  function renderChart(rows) {
+    const wrap = document.getElementById('chartWrap');
+    const empty = document.getElementById('chartEmpty');
+    wrap.innerHTML = '';
+
+    if (rows.length === 0) {
+      empty.classList.remove('hidden');
+      return;
+    }
+    empty.classList.add('hidden');
+
+    const byDay = {};
+    rows.forEach((r) => {
+      const k = dayKey(r.created_at);
+      if (!byDay[k]) byDay[k] = { pageview: 0, click: 0 };
+      byDay[k][r.event_type]++;
+    });
+
+    const days = Object.keys(byDay).sort();
+    const maxVal = Math.max(1, ...days.map((d) => Math.max(byDay[d].pageview, byDay[d].click)));
+
+    const w = 640, h = 180, pad = 24, gap = 10;
+    const groupW = (w - pad * 2) / days.length;
+    const barW = Math.max(4, (groupW - gap) / 2);
+
+    let bars = '';
+    days.forEach((d, i) => {
+      const x = pad + i * groupW;
+      const vView = byDay[d].pageview, vClick = byDay[d].click;
+      const hView = (vView / maxVal) * (h - 40);
+      const hClick = (vClick / maxVal) * (h - 40);
+      const label = d.slice(5).replace('-', '/');
+
+      bars += `<rect x="${x}" y="${h - 24 - hView}" width="${barW}" height="${hView}" rx="3" fill="var(--teal-700)"><title>${d}: ${vView} visitas</title></rect>`;
+      bars += `<rect x="${x + barW + 2}" y="${h - 24 - hClick}" width="${barW}" height="${hClick}" rx="3" fill="var(--coral-500)"><title>${d}: ${vClick} cliques</title></rect>`;
+
+      if (days.length <= 14 || i % Math.ceil(days.length / 12) === 0) {
+        bars += `<text x="${x + groupW / 2 - gap / 2}" y="${h - 6}" font-size="9.5" fill="var(--plum-600)" text-anchor="middle">${label}</text>`;
+      }
+    });
+
+    wrap.innerHTML = `<svg viewBox="0 0 ${w} ${h}" style="width:100%;height:auto;display:block;">${bars}</svg>`;
+  }
+
+  function renderTargets(rows) {
+    const tbody = document.querySelector('#targetsTable tbody');
+    const empty = document.getElementById('targetsEmpty');
+    tbody.innerHTML = '';
+
+    const clicks = rows.filter((r) => r.event_type === 'click');
+    if (clicks.length === 0) {
+      empty.classList.remove('hidden');
+      return;
+    }
+    empty.classList.add('hidden');
+
+    const counts = {};
+    clicks.forEach((r) => {
+      const t = r.target || 'unknown';
+      counts[t] = (counts[t] || 0) + 1;
+    });
+
+    const labels = { hero: 'Topo (hero)', beneficios: 'Seção de benefícios', sticky: 'Barra fixa', unknown: 'Não identificado' };
+
+    Object.entries(counts).sort((a, b) => b[1] - a[1]).forEach(([target, count]) => {
+      tbody.innerHTML += `<tr><td>${labels[target] || target}</td><td class="num">${count}</td></tr>`;
+    });
+  }
+
+  function renderReferrers(rows) {
+    const tbody = document.querySelector('#referrersTable tbody');
+    const empty = document.getElementById('referrersEmpty');
+    tbody.innerHTML = '';
+
+    const views = rows.filter((r) => r.event_type === 'pageview');
+    if (views.length === 0) {
+      empty.classList.remove('hidden');
+      return;
+    }
+    empty.classList.add('hidden');
+
+    const counts = {};
+    views.forEach((r) => {
+      const host = hostFromReferrer(r.referrer);
+      counts[host] = (counts[host] || 0) + 1;
+    });
+
+    Object.entries(counts).sort((a, b) => b[1] - a[1]).slice(0, 8).forEach(([host, count]) => {
+      tbody.innerHTML += `<tr><td>${host}</td><td class="num">${count}</td></tr>`;
+    });
+  }
+
+  function renderRecentEvents(rows) {
+    const tbody = document.querySelector('#eventsTable tbody');
+    const empty = document.getElementById('eventsEmpty');
+    tbody.innerHTML = '';
+
+    if (rows.length === 0) {
+      empty.classList.remove('hidden');
+      return;
+    }
+    empty.classList.add('hidden');
+
+    const labels = { hero: 'Topo (hero)', beneficios: 'Seção de benefícios', sticky: 'Barra fixa' };
+
+    rows.slice(0, 30).forEach((r) => {
+      const when = new Date(r.created_at).toLocaleString('pt-BR', { day: '2-digit', month: '2-digit', hour: '2-digit', minute: '2-digit' });
+      const tag = r.event_type === 'click'
+        ? `<span class="tag click">clique</span>`
+        : `<span class="tag pageview">visita</span>`;
+      const detail = r.event_type === 'click'
+        ? (labels[r.target] || r.target || '—')
+        : hostFromReferrer(r.referrer);
+      tbody.innerHTML += `<tr><td>${when}</td><td>${tag}</td><td>${detail}</td></tr>`;
+    });
+  }
+
+  async function loadData() {
+    const cutoff = rangeCutoffIso();
+
+    let query = sb
+      .from('site_events')
+      .select('event_type, target, referrer, created_at, session_id')
+      .eq('site', SITE)
+      .order('created_at', { ascending: false })
+      .limit(5000);
+
+    if (cutoff) query = query.gte('created_at', cutoff);
+
+    const { data, error } = await query;
+
+    if (error) {
+      console.error(error);
+      return;
+    }
+
+    const rows = data || [];
+    const views = rows.filter((r) => r.event_type === 'pageview');
+    const clicks = rows.filter((r) => r.event_type === 'click');
+    const uniqueSessions = new Set(views.map((r) => r.session_id)).size;
+    const ctr = views.length > 0 ? ((clicks.length / views.length) * 100).toFixed(1) + '%' : '—';
+
+    document.getElementById('statViews').textContent = views.length;
+    document.getElementById('statClicks').textContent = clicks.length;
+    document.getElementById('statCtr').textContent = ctr;
+    document.getElementById('statUnique').textContent = uniqueSessions;
+
+    renderChart(rows);
+    renderTargets(rows);
+    renderReferrers(rows);
+    renderRecentEvents(rows);
+  }
+
+  boot();
+</script>
+
+</body>
+</html>
