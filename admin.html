@@ -511,6 +511,11 @@
       .from('site_events')
       .select('event_type, target, referrer, created_at, session_id')
       .eq('site', SITE)
+      .not('user_agent', 'ilike', '%bot%')
+      .not('user_agent', 'ilike', '%crawler%')
+      .not('user_agent', 'ilike', '%spider%')
+      .not('user_agent', 'ilike', '%facebookexternalhit%')
+      .not('user_agent', 'ilike', '%meta-externalads%')
       .order('created_at', { ascending: false })
       .limit(5000);
 
