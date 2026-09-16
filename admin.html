@@ -171,6 +171,15 @@
   .tag.click{background:var(--coral-050);color:var(--coral-500);}
 
   .events-scroll{max-height:340px;overflow-y:auto;}
+  .table-scroll{overflow-x:auto;}
+  #dailyTable{min-width:560px;}
+
+  .entries-form{
+    display:flex;gap:12px;align-items:flex-end;flex-wrap:wrap;
+  }
+  .entries-form .field{margin-bottom:0;flex:1;min-width:140px;}
+  .entries-form .field input{padding:11px 12px;}
+  .entries-save{width:auto;padding:12px 22px;margin-top:0;flex-shrink:0;}
 
   footer.note{
     text-align:center;font-size:12px;color:var(--plum-300);
@@ -235,6 +244,38 @@
       <div class="label">Visitantes únicos (aprox.)</div>
       <div class="value" id="statUnique">—</div>
     </div>
+  </div>
+
+  <div class="panel">
+    <h2>Registrar entradas do dia</h2>
+    <form id="entriesForm" class="entries-form">
+      <div class="field">
+        <label for="entryDate">Data</label>
+        <input type="date" id="entryDate" required>
+      </div>
+      <div class="field">
+        <label for="entryCount">Entradas no grupo</label>
+        <input type="number" id="entryCount" min="0" step="1" required>
+      </div>
+      <button type="submit" class="btn-primary entries-save">Salvar</button>
+    </form>
+    <p class="error-msg" id="entrySavedMsg" style="color:var(--teal-900);"></p>
+  </div>
+
+  <div class="panel">
+    <h2>Resumo diário</h2>
+    <div class="table-scroll">
+      <table id="dailyTable">
+        <thead>
+          <tr>
+            <th>Data</th><th class="num">Cliques</th><th class="num">Visitas</th><th class="num">Entradas</th>
+            <th class="num">Entr./Clique</th><th class="num">Clique/Visita</th><th class="num">Entr./Visita</th>
+          </tr>
+        </thead>
+        <tbody></tbody>
+      </table>
+    </div>
+    <p class="empty hidden" id="dailyEmpty">Nenhum dado neste período ainda.</p>
   </div>
 
   <div class="panel">
@@ -387,6 +428,16 @@
     }
   }
 
+  function bucketByDay(rows) {
+    const byDay = {};
+    rows.forEach((r) => {
+      const k = dayKey(r.created_at);
+      if (!byDay[k]) byDay[k] = { pageview: 0, click: 0 };
+      byDay[k][r.event_type]++;
+    });
+    return byDay;
+  }
+
   function renderChart(rows) {
     const wrap = document.getElementById('chartWrap');
     const empty = document.getElementById('chartEmpty');
@@ -398,12 +449,7 @@
     }
     empty.classList.add('hidden');
 
-    const byDay = {};
-    rows.forEach((r) => {
-      const k = dayKey(r.created_at);
-      if (!byDay[k]) byDay[k] = { pageview: 0, click: 0 };
-      byDay[k][r.event_type]++;
-    });
+    const byDay = bucketByDay(rows);
 
     const days = Object.keys(byDay).sort();
     const maxVal = Math.max(1, ...days.map((d) => Math.max(byDay[d].pageview, byDay[d].click)));
@@ -543,7 +589,84 @@
     renderTargets(rows);
     renderReferrers(rows);
     renderRecentEvents(rows);
+
+    let entriesQuery = sb
+      .from('daily_entries')
+      .select('entry_date, entries')
+      .order('entry_date', { ascending: false });
+
+    if (cutoff) entriesQuery = entriesQuery.gte('entry_date', cutoff.slice(0, 10));
+
+    const { data: entriesData, error: entriesError } = await entriesQuery;
+    if (entriesError) console.error(entriesError);
+
+    renderDailyTable(rows, entriesData || []);
   }
+
+  function renderDailyTable(rows, entriesData) {
+    const tbody = document.querySelector('#dailyTable tbody');
+    const empty = document.getElementById('dailyEmpty');
+    tbody.innerHTML = '';
+
+    const byDay = bucketByDay(rows);
+    const entriesByDay = {};
+    entriesData.forEach((e) => { entriesByDay[e.entry_date] = e.entries; });
+
+    const allDays = new Set([...Object.keys(byDay), ...Object.keys(entriesByDay)]);
+    if (allDays.size === 0) {
+      empty.classList.remove('hidden');
+      return;
+    }
+    empty.classList.add('hidden');
+
+    const pct = (num, den) => den > 0 ? ((num / den) * 100).toFixed(1) + '%' : '—';
+
+    [...allDays].sort().reverse().forEach((d) => {
+      const cliques = byDay[d] ? byDay[d].click : 0;
+      const visitas = byDay[d] ? byDay[d].pageview : 0;
+      const entradas = entriesByDay[d] || 0;
+      const label = d.slice(8, 10) + '/' + d.slice(5, 7) + '/' + d.slice(2, 4);
+
+      tbody.innerHTML += `<tr>
+        <td>${label}</td>
+        <td class="num">${cliques}</td>
+        <td class="num">${visitas}</td>
+        <td class="num">${entradas}</td>
+        <td class="num">${pct(entradas, cliques)}</td>
+        <td class="num">${pct(cliques, visitas)}</td>
+        <td class="num">${pct(entradas, visitas)}</td>
+      </tr>`;
+    });
+  }
+
+  const entriesForm = document.getElementById('entriesForm');
+  const entryDateInput = document.getElementById('entryDate');
+  const entrySavedMsg = document.getElementById('entrySavedMsg');
+
+  entryDateInput.valueAsDate = new Date();
+
+  entriesForm.addEventListener('submit', async (e) => {
+    e.preventDefault();
+    entrySavedMsg.style.display = 'none';
+
+    const { data: { user } } = await sb.auth.getUser();
+    const entry_date = entryDateInput.value;
+    const entries = parseInt(document.getElementById('entryCount').value, 10) || 0;
+
+    const { error } = await sb
+      .from('daily_entries')
+      .upsert({ entry_date, entries, updated_by: user.id, updated_at: new Date().toISOString() });
+
+    if (error) {
+      entrySavedMsg.style.color = 'var(--coral-500)';
+      entrySavedMsg.textContent = 'Erro ao salvar. Tenta de novo.';
+    } else {
+      entrySavedMsg.style.color = 'var(--teal-900)';
+      entrySavedMsg.textContent = `Entradas de ${entry_date.split('-').reverse().join('/')} salvas!`;
+      loadData();
+    }
+    entrySavedMsg.style.display = 'block';
+  });
 
   boot();
 </script>
